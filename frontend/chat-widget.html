@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsa - مساعدك الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forsa-primary: #00B4B4;
+            --forsa-secondary: #009999;
+            --forsa-dark: #E6F7F7;
+            --forsa-light: #E0AAFF;
+            --forsa-bg: #F8F9FA;
+            --forsa-text: #425466;
+            --forsa-white: #FFFFFF;
+            --forsa-success: #00D4AA;
+            --forsa-warning: #FFB800;
+            --forsa-new: #FFB800;
+            --forsa-existing: #00D4AA;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
+        body {
+            font-family: 'Inter', 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--forsa-bg) 0%, #EEF2FF 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--forsa-text);
+        }
+
+        .demo-container {
+            text-align: center;
+            padding: 40px;
+            max-width: 700px;
+        }
+
+        .forsa-logo-large {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, var(--forsa-primary) 0%, var(--forsa-secondary) 100%);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 20px 60px rgba(0, 180, 180, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .forsa-logo-large::before {
+            content: 'فُرصة';
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .demo-container h1 { 
+            font-size: 2.5em; 
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--forsa-primary), var(--forsa-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .demo-container p { 
+            margin-bottom: 15px; 
+            opacity: 0.8;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .mode-selector {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0, 180, 180, 0.1);
+            border: 2px solid rgba(0, 180, 180, 0.1);
+        }
+
+        .mode-selector h3 {
+            margin-bottom: 20px;
+            color: var(--forsa-text);
+            font-size: 1.3em;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: white;
+            border: 3px solid #e0e0e0;
+            padding: 20px 30px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+        }
+
+        .mode-btn .icon {
+            font-size: 32px;
+        }
+
+        .mode-btn.new-customer:hover,
+        .mode-btn.new-customer.active {
+            border-color: var(--forsa-new);
+            background: #FFF8E7;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 184, 0, 0.2);
+        }
+
+        .mode-btn.existing-customer:hover,
+        .mode-btn.existing-customer.active {
+            border-color: var(--forsa-existing);
+            background: #E6FAF5;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.2);
+        }
+
+        .feature-tags {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: white;
+            color: var(--forsa-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0, 180, 180, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tag:hover {
+            border-color: var(--forsa-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 420px;
+            max-width: 90vw;
+            background: var(--forsa-white);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 180, 180, 0.25);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            border: 1px solid rgba(0, 180, 180, 0.1);
+        }
+
+        .chat-widget.minimized {
+            height: 70px;
+            width: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 180, 180, 0.3);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--forsa-primary) 0%, var(--forsa-secondary) 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .chat-header-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            position: relative;
+            z-index: 1;
+        }
+
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot-avatar::before {
+            content: 'ف';
+            color: var(--forsa-primary);
+            font-weight: 700;
+            font-size: 28px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .bot-status { display: flex; flex-direction: column; }
+        .bot-name { 
+            font-weight: 700; 
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+        
+        .user-type-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 600;
+            display: inline-block;
+            width: fit-content;
+        }
+        
+        .user-type-badge.new {
+            background: rgba(255, 184, 0, 0.9);
+            color: #333;
+        }
+        
+        .user-type-badge.existing {
+            background: rgba(0, 212, 170, 0.9);
+            color: #333;
+        }
+        
+        .bot-online {
+            font-size: 13px;
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #4ade80;
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.7; transform: scale(1.1); } 
+        }
+
+        .chat-controls { 
+            display: flex; 
+            gap: 10px; 
+            position: relative;
+            z-index: 1;
+        }
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            font-size: 16px;
+        }
+        .control-btn:hover { 
+            background: rgba(255,255,255,0.3); 
+            transform: scale(1.1);
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 85px;
+            right: 20px;
+            background: white;
+            border: 2px solid rgba(0, 180, 180, 0.1);
+            border-radius: 24px;
+            padding: 6px;
+            display: flex;
+            gap: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            z-index: 10;
+        }
+        .lang-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+            color: #666;
+        }
+        .lang-btn.active { 
+            background: var(--forsa-primary); 
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 180, 180, 0.3);
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 24px 20px;
+            background: linear-gradient(180deg, #FAFBFF 0%, var(--forsa-white) 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--forsa-primary);
+            border-radius: 3px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            animation: messageSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--forsa-primary) 0%, var(--forsa-secondary) 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        .message.bot {
+            align-self: flex-start;
+            background: white;
+            color: var(--forsa-text);
+            border-bottom-left-radius: 6px;
+            border: 1px solid rgba(0, 180, 180, 0.1);
+        }
+        .message-time { 
+            font-size: 11px; 
+            opacity: 0.7; 
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: white;
+            padding: 18px 24px;
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0, 180, 180, 0.1);
+        }
+        .typing-indicator.active { display: flex; gap: 6px; align-items: center; }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--forsa-primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+            opacity: 0.4;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quick-reply {
+            background: white;
+            border: 2px solid rgba(0, 180, 180, 0.15);
+            border-radius: 18px;
+            padding: 8px 14px;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: var(--forsa-text);
+        }
+        .quick-reply:hover {
+            background: var(--forsa-primary);
+            color: white;
+            border-color: var(--forsa-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 180, 180, 0.3);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid rgba(0, 180, 180, 0.08);
+            display: flex;
+            gap: 12px;
+        }
+        .chat-input {
+            flex: 1;
+            border: 2px solid rgba(0, 180, 180, 0.15);
+            border-radius: 24px;
+            padding: 14px 22px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: #FAFBFF;
+        }
+        .chat-input:focus { 
+            border-color: var(--forsa-primary); 
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 180, 180, 0.1);
+        }
+        .chat-input::placeholder {
+            color: #999;
+        }
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--forsa-primary) 0%, var(--forsa-secondary) 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 180, 180, 0.3);
+            font-size: 18px;
+        }
+        .send-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 25px rgba(0, 180, 180, 0.4);
+        }
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .minimized-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--forsa-primary) 0%, var(--forsa-secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 180, 180, 0.4);
+            animation: bounce 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .minimized-icon::before {
+            content: 'فُرصة';
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .minimized-icon::after {
+            content: '💬';
+            position: absolute;
+            bottom: 8px;
+            font-size: 12px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .forsa-watermark {
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            color: #999;
+            background: white;
+            border-top: 1px solid rgba(0, 180, 180, 0.05);
+        }
+
+        .forsa-watermark strong {
+            color: var(--forsa-primary);
+        }
+
+        @media (max-width: 480px) {
+            .chat-widget {
+                width: 100%;
+                right: 0;
+                bottom: 0;
+                border-radius: 24px 24px 0 0;
+            }
+            .chat-widget.minimized {
+                right: 20px;
+                bottom: 20px;
+                border-radius: 50%;
+            }
+            .mode-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .mode-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="forsa-logo-large"></div>
+        <h1>Forsa Finance</h1>
+        <p>Experience the future of customer service with our AI-powered assistant. Available 24/7 in Arabic and English.</p>
+        <p><strong>فُرصة</strong> - Buy Now, Pay Later made simple</p>
+        
+        <div class="mode-selector">
+            <h3>👤 Select Customer Type / اختار نوع العميل</h3>
+            <div class="mode-buttons">
+                <button class="mode-btn new-customer" onclick="setUserType('new')" id="btn-new">
+                    <span class="icon">🟡</span>
+                    <span>New Customer<br>عميل جديد</span>
+                </button>
+                <button class="mode-btn existing-customer" onclick="setUserType('existing')" id="btn-existing">
+                    <span class="icon">🟢</span>
+                    <span>Existing Customer<br>عميل حالي</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="feature-tags">
+            <span class="tag">⚡ Instant Answers</span>
+            <span class="tag">🌍 Arabic & English</span>
+            <span class="tag">🔒 Secure</span>
+            <span class="tag">💜 Forsa Official</span>
+        </div>
+    </div>
+
+    <div class="chat-widget minimized" id="chatWidget">
+        <div class="minimized-icon" onclick="toggleChat()"></div>
+        <div class="chat-expanded" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="bot-avatar"></div>
+                    <div class="bot-status">
+                        <span class="bot-name">Forsa Assistant</span>
+                        <span class="user-type-badge" id="userTypeBadge">Select Type ↑</span>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button class="control-btn" onclick="toggleLanguage()" title="Switch Language">🌐</button>
+                    <button class="control-btn" onclick="toggleChat()" title="Close">✕</button>
+                </div>
+            </div>
+            <div class="language-toggle">
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">عربي</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Select customer type first..." onkeypress="handleKeyPress(event)" disabled>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>➤</button>
+            </div>
+            <div class="forsa-watermark">
+                Powered by <strong>Forsa</strong> • خدمة عملاء 16845
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/chat';
+        let sessionId = null;
+        let currentLanguage = 'en';
+        let userType = null; // 'new' or 'existing'
+
+        function setUserType(type) {
+            userType = type;
+            
+            // Update UI buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
+            
+            // Update badge in chat header
+            const badge = document.getElementById('userTypeBadge');
+            badge.textContent = type === 'new' ? 'New Customer / عميل جديد' : 'Existing / عميل حالي';
+            badge.className = `user-type-badge ${type}`;
+            
+            // Enable chat input
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            input.disabled = false;
+            sendBtn.disabled = false;
+            
+            // Open chat automatically
+            const widget = document.getElementById('chatWidget');
+            if (widget.classList.contains('minimized')) {
+                toggleChat();
+            }
+            
+            // Update placeholder
+            updateLanguageUI();
+            
+            // Send greeting
+            setTimeout(() => {
+                sendToBot("START_CONVERSATION");
+            }, 600);
+        }
+
+        function toggleChat() {
+            const widget = document.getElementById('chatWidget');
+            const expanded = widget.querySelector('.chat-expanded');
+            const minimized = widget.querySelector('.minimized-icon');
+
+            if (widget.classList.contains('minimized')) {
+                widget.classList.remove('minimized');
+                expanded.style.display = 'block';
+                minimized.style.display = 'none';
+                widget.style.width = '420px';
+                widget.style.height = '620px';
+                widget.style.borderRadius = '24px';
+                
+                if (userType) {
+                    document.getElementById('chatInput').focus();
+                }
+            } else {
+                widget.classList.add('minimized');
+                expanded.style.display = 'none';
+                minimized.style.display = 'flex';
+                widget.style.width = '70px';
+                widget.style.height = '70px';
+                widget.style.borderRadius = '50%';
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            updateLanguageUI();
+            
+            const greeting = currentLanguage === 'en' ? 
+                "Switched to English 🇬🇧" : 
+                "اتغير للعربي 🇪🇬";
+            addMessage('bot', greeting);
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            updateLanguageUI();
+        }
+
+        function updateLanguageUI() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(currentLanguage === 'en' ? 'en' : 'عربي')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            const input = document.getElementById('chatInput');
+            if (!userType) {
+                input.placeholder = currentLanguage === 'en' ? 
+                    'Select customer type first...' : 
+                    'اختار نوع العميل أولاً...';
+            } else if (userType === 'new') {
+                input.placeholder = currentLanguage === 'en' ? 
+                    'Try: I want to join Forsa' : 
+                    'جرب: عايز اشترك في فورسا';
+            } else {
+                input.placeholder = currentLanguage === 'en' ? 
+                    'Try: Check my balance' : 
+                    'جرب: ايه رصيدي';
+            }
+            input.style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        function showTyping() { 
+            document.getElementById('typingIndicator').classList.add('active'); 
+        }
+        
+        function hideTyping() { 
+            document.getElementById('typingIndicator').classList.remove('active'); 
+        }
+
+        function addMessage(sender, text) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--forsa-primary);">$1</strong>')
+                .replace(/\n/g, '<br>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--forsa-primary); text-decoration: underline; font-weight: 600;">$1</a>');
+                
+            messageDiv.innerHTML = `${formattedText}<div class="message-time">${time}</div>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+                function addQuickReplies(replies) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const quickDiv = document.createElement('div');
+            quickDiv.className = 'quick-replies';
+            
+            replies.forEach(reply => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-reply';
+                btn.textContent = reply;
+                btn.onclick = () => {
+                    document.getElementById('chatInput').value = reply;
+                    sendMessage();
+                };
+                quickDiv.appendChild(btn);
+            });
+            
+            messagesContainer.appendChild(quickDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendToBot(message) {
+            if (!userType && message !== "START_CONVERSATION") {
+                addMessage('bot', currentLanguage === 'en' ? 
+                    '👆 Please select your customer type above first!' : 
+                    '👆 من فضلك اختار نوع العميل من فوق الأول!');
+                return;
+            }
+            
+            showTyping();
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: message, 
+                        session_id: sessionId, 
+                        user_id: userType === 'existing' ? 'user123' : null,
+                        user_type: userType
+                    })
+                });
+                
+                const data = await response.json();
+                sessionId = data.session_id;
+                hideTyping();
+                
+                setTimeout(() => {
+                    addMessage('bot', data.response);
+                    
+                    // Add contextual quick replies
+                    let quicks = [];
+                    if (userType === 'new') {
+                        quicks = currentLanguage === 'en' ? [
+                            "Check eligibility",
+                            "Required documents", 
+                            "Calculate installment",
+                            "Find branch"
+                        ] : [
+                            "فحص التأهل",
+                            "الأوراق المطلوبة",
+                            "حساب القسط",
+                            "اقرب فرع"
+                        ];
+                    } else if (userType === 'existing') {
+                        quicks = currentLanguage === 'en' ? [
+                            "My balance",
+                            "My installments", 
+                            "Change phone number",
+                            "Calculate installment"
+                        ] : [
+                            "رصيدي",
+                            "اقساطي",
+                            "تغيير رقم التليفون",
+                            "احسب قسط"
+                        ];
+                    }
+                    
+                    if (data.intent === 'general' || data.intent === 'greeting' || !data.intent) {
+                        addQuickReplies(quicks);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                const errorMsg = currentLanguage === 'en' ? 
+                    "Sorry, can't connect to server. Please make sure it's running on port 8000." :
+                    "مش قادر أتصل بالسيرفر. تأكد إنه شغال على البورت 8000.";
+                addMessage('bot', errorMsg);
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage('user', message);
+            input.value = '';
+            
+            await sendToBot(message);
+        }
+
+        // Initialize
+        updateLanguageUI();
+    </script>
+</body>
+</html>
