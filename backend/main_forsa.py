@@ -833,6 +833,22 @@ async def health_check():
         ]
     }
 
+
+@app.get("/")
+async def root():
+    return {
+        "service": "Forsa Finance AI Chatbot",
+        "version": "5.4.0-live",
+        "status": "running",
+        "endpoints": {
+            "chat": "/chat",
+            "health": "/health"
+        },
+        "message": "Chatbot API is running! Use POST /chat to interact."
+    }
+
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
